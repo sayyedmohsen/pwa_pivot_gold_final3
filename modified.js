@@ -9,8 +9,8 @@ function getTodayUTCDate() {
 
 const today = getTodayUTCDate();
 
-// چک کردن تاریخ آخرین بروزرسانی ذخیره‌شده در localStorage
-const lastUpdatedDate = localStorage.getItem("lastUpdatedDatePivot");
+// چک کردن تاریخ آخرین بروزرسانی ذخیره شده در localStorage
+const lastUpdatedDate = localStorage.getItem("lastUpdatedDate");
 
 // اگر تاریخ امروز همان تاریخ ذخیره‌شده در localStorage باشد، از داده‌های قبلی استفاده می‌کنیم
 if (lastUpdatedDate === today) {
@@ -33,29 +33,33 @@ if (lastUpdatedDate === today) {
       </table>
     `;
     document.getElementById("modified-results").innerHTML = resultTable;
-    console.log("داده‌ها از localStorage خوانده شدند.");
   }
+  console.log("داده‌ها از localStorage خوانده شدند.");
 } else {
-  // دریافت داده‌های امروز از API
-  fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&apikey=${apiKey}&outputsize=1`)
+  // تاریخ دیروز
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const startDate = yesterday.toISOString().split("T")[0] + " 00:00:00";
+  const endDate = yesterday.toISOString().split("T")[0] + " 23:59:00";
+
+  // درخواست به API برای دریافت داده‌های دیروز
+  fetch(`https://api.twelvedata.com/time_series?apikey=${apiKey}&interval=1day&timezone=utc&symbol=${symbol}&start_date=${startDate}&end_date=${endDate}`)
     .then(res => res.json())
     .then(data => {
       const values = data.values[0];
       const high = parseFloat(values.high);
       const low = parseFloat(values.low);
       const close = parseFloat(values.close);
-      const open = parseFloat(values.open);
 
-      // محاسبه پیوت پوینت اصلی (بدون استفاده از Open)
+      // محاسبه پیوت پوینت به روش کلاسیک
       const pivot = (high + low + close) / 3;
       const R1 = (2 * pivot) - low;
-      const R2 = pivot + (high - low);
-      const R3 = high + 2 * (pivot - low);
       const S1 = (2 * pivot) - high;
+      const R2 = pivot + (high - low);
       const S2 = pivot - (high - low);
+      const R3 = high + 2 * (pivot - low);
       const S3 = low - 2 * (high - pivot);
 
-      // ساخت جدول برای نمایش
       const resultTable = `
         <table>
           <tr><th>Date (UTC)</th><th>Pivot</th><th>R1</th><th>R2</th><th>R3</th><th>S1</th><th>S2</th><th>S3</th></tr>
@@ -71,6 +75,7 @@ if (lastUpdatedDate === today) {
           </tr>
         </table>
       `;
+
       document.getElementById("modified-results").innerHTML = resultTable;
 
       // ذخیره داده‌ها در localStorage برای استفاده در روزهای بعدی
@@ -85,11 +90,7 @@ if (lastUpdatedDate === today) {
         S3: S3.toFixed(2),
       };
       localStorage.setItem("pivotData", JSON.stringify(pivotData));
-      localStorage.setItem("lastUpdatedDatePivot", today);
-
+      localStorage.setItem("lastUpdatedDate", today);
     })
-    .catch(err => {
-      console.error("API error:", err);
-      document.getElementById("modified-results").innerHTML = `<tr><td colspan="8">خطا در دریافت داده‌ها</td></tr>`;
-    });
+    .catch(err => console.error("API error:", err));
 }
