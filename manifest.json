@@ -1,0 +1,9 @@
+{
+  "name": "Pivot Gold",
+  "short_name": "Pivot",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#fff8e1",
+  "theme_color": "#d4af37",
+  "icons": []
+}

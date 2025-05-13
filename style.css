@@ -1,0 +1,50 @@
+@font-face {
+  font-family: 'IRANSans';
+  src: url('./fonts/IRANSans.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'IRANSans', sans-serif;
+  direction: rtl;
+  background: #fff8e1;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background: #d4af37;
+  padding: 10px;
+  text-align: center;
+}
+
+.navbar a {
+  color: white;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #d4af37;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}
